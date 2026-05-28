@@ -21,7 +21,7 @@
 	let latitude = $state(ssr.latitude ?? 41.8903);
 	let longitude = $state(ssr.longitude ?? 12.4964);
 	let timezone = $state(ssr.timezone ?? 'Europe/Rome');
-	let historicalYears = $state(ssr.historicalYears ?? 20);
+	let historicalYears = $state(ssr.historicalYears ?? 80);
 	let unit = $state<'C' | 'F'>('C');
 	let error = $state('');
 	let loading = $state(weatherData === null);
@@ -32,7 +32,7 @@
 	$effect(() => {
 		if (typeof window !== 'undefined' && !weatherData && !hasClientFallback) {
 			hasClientFallback = true;
-			fetchWeatherData(41.8903, 12.4922, 'Roma', 'Italia', 'Europe/Rome', 20);
+			fetchWeatherData(41.8903, 12.4922, 'Roma', 'Italia', 'Europe/Rome', 80);
 		}
 	});
 

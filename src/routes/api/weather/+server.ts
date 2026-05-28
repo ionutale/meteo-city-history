@@ -14,7 +14,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		return json({ error: 'lat and lon query params are required' }, { status: 400 });
 	}
 
-	const fyears = isNaN(years) || years < 1 ? 20 : years;
+	const fyears = isNaN(years) || years < 1 ? 80 : years;
 
 	try {
 		const data = await getOrFetchWeather(lat, lon, city, country, tz, fyears);
