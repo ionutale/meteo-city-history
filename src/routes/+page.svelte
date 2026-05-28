@@ -11,45 +11,27 @@
 	import HistoricalAnalysis from '$lib/components/HistoricalAnalysis.svelte';
 
 	let {
-		weatherData: initialWeather,
-		historicalData: initialHistorical,
-		cityName: initialCity,
-		country: initialCountry,
-		latitude: initialLat,
-		longitude: initialLon,
-		timezone: initialTz,
-		historicalYears: initialYears = 20
+		ssr = {} as import('$lib/types').WeatherResponse
 	}: {
-		weatherData: WeatherData | null;
-		historicalData: HistoricalData | null;
-		cityName: string;
-		country: string;
-		latitude: number;
-		longitude: number;
-		timezone: string;
-		historicalYears?: number;
+		ssr?: import('$lib/types').WeatherResponse;
 	} = $props();
+
+	let initialWeather = $state<WeatherData | null>(ssr.weatherData ?? null);
+	let initialHistorical = $state<HistoricalData | null>(ssr.historicalData ?? null);
 
 	let weatherData = $state<WeatherData | null>(initialWeather);
 	let historicalData = $state<HistoricalData | null>(initialHistorical);
-	let cityName = $state(initialCity);
-	let country = $state(initialCountry);
-	let latitude = $state(initialLat);
-	let longitude = $state(initialLon);
-	let timezone = $state(initialTz);
-	let historicalYears = $state(initialYears);
+	let cityName = $state(ssr.cityName ?? 'Roma');
+	let country = $state(ssr.country ?? 'Italia');
+	let latitude = $state(ssr.latitude ?? 41.8903);
+	let longitude = $state(ssr.longitude ?? 12.4964);
+	let timezone = $state(ssr.timezone ?? 'Europe/Rome');
+	let historicalYears = $state(ssr.historicalYears ?? 20);
 	let unit = $state<'C' | 'F'>('C');
 	let error = $state('');
 	let loading = $state(initialWeather === null);
 	let historicalLoading = $state(false);
 	let hasClientFallback = $state(false);
-
-	// Debug: check if SSR is getting weatherData
-	$effect(() => {
-		if (typeof window !== 'undefined') {
-			console.log('CLIENT initialWeather', initialWeather ? 'exists' : 'null');
-		}
-	});
 
 	// If SSR returned no data, fetch default Rome from client
 	$effect(() => {
@@ -262,7 +244,7 @@
 					{unit}
 					{cityName}
 					{historicalYears}
-					{isLoading}
+					isLoading={historicalLoading}
 					onyearschange={handleYearsChange}
 				/>
 			</main>

@@ -22,18 +22,20 @@ export const load: PageServerLoad = async ({ url }) => {
 	try {
 		const data = await getOrFetchWeather(flat, flon, city, country, tz, fyears);
 		console.log('SSR load data weatherData:', data.weatherData ? 'exists' : 'null');
-		return data;
+		return { ssr: data as import('$lib/types').WeatherResponse };
 	} catch (e) {
 		console.error('SSR load failed, returning empty', e);
 		return {
-			weatherData: null,
-			historicalData: null,
-			cityName: city,
-			country,
-			latitude: flat,
-			longitude: flon,
-			timezone: tz,
-			historicalYears: fyears
-		} satisfies import('$lib/types').WeatherResponse;
+			ssr: {
+				weatherData: null,
+				historicalData: null,
+				cityName: city,
+				country,
+				latitude: flat,
+				longitude: flon,
+				timezone: tz,
+				historicalYears: fyears
+			} as import('$lib/types').WeatherResponse
+		};
 	}
 };
