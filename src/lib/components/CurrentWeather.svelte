@@ -48,8 +48,8 @@
 	<div>
 		<div class="flex items-start justify-between">
 			<div>
-				<h2 class="text-3xl font-extrabold tracking-tight">{cityName}</h2>
-				<p class="text-sm font-medium text-white/60">{country}</p>
+				<h2 id="current-city" class="text-3xl font-extrabold tracking-tight">{cityName}</h2>
+				<p id="current-country" class="text-sm font-medium text-white/60">{country}</p>
 			</div>
 			<span class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold"
 				>Ora locale: {localTime()}</span
@@ -59,13 +59,15 @@
 		<div class="my-8 flex items-center justify-between">
 			<div>
 				<div class="flex items-start">
-					<span class="text-7xl font-black tracking-tighter"
+					<span id="current-temp" class="text-7xl font-black tracking-tighter"
 						>{convertTemp(weatherData.current.temperature_2m, unit)}</span
 					>
-					<span class="mt-1 text-3xl font-bold text-indigo-300">°{unit}</span>
+					<span id="temp-unit-symbol" class="mt-1 text-3xl font-bold text-indigo-300"
+						>°{unit}</span
+					>
 				</div>
 				<div class="mt-2 flex items-center gap-1.5">
-					<span class="text-sm font-medium text-white/80"
+					<span id="min-max-temp" class="text-sm font-medium text-white/80"
 						>Max: {maxToday}°{unit} &bull; Min: {minToday}°{unit}</span
 					>
 				</div>
@@ -76,7 +78,9 @@
 				>
 					<i data-lucide={details.icon} class="{details.color} h-20 w-20"></i>
 				</div>
-				<span class="mt-1 text-center text-sm font-semibold tracking-wide text-indigo-200 uppercase"
+				<span
+					id="weather-description"
+					class="mt-1 text-center text-sm font-semibold tracking-wide text-indigo-200 uppercase"
 					>{details.desc}</span
 				>
 			</div>

@@ -4,11 +4,12 @@
 
 {#if message}
 	<div
+		id="error-banner"
 		class="mb-6 flex items-center justify-between rounded-2xl border border-rose-400/50 bg-rose-500/90 px-4 py-3 text-white shadow-lg backdrop-blur-md transition-all duration-300"
 	>
 		<div class="flex items-center gap-3">
 			<i data-lucide="alert-circle" class="h-5 w-5 flex-shrink-0"></i>
-			<span class="text-sm font-medium">{message}</span>
+			<span id="error-text" class="text-sm font-medium">{message}</span>
 		</div>
 		<button
 			onclick={() => onclose?.()}

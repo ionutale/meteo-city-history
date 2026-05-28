@@ -66,13 +66,14 @@
 					data-lucide="search"
 					class="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 transform text-white/50"
 				></i>
-				<input
-					type="text"
-					bind:value={inputValue}
-					oninput={handleInput}
-					placeholder="Cerca una città nel mondo (es. Milano, Tokyo, Paris...)"
-					class="w-full rounded-2xl border border-white/10 bg-white/10 py-3.5 pr-4 pl-12 text-base text-white placeholder-white/50 backdrop-blur-md transition-all outline-none hover:bg-white/15 focus:border-white/30 focus:bg-white/20 focus:ring-2 focus:ring-indigo-500/50"
-				/>
+		<input
+			id="search-input"
+			type="text"
+			bind:value={inputValue}
+			oninput={handleInput}
+			placeholder="Cerca una città nel mondo (es. Milano, Tokyo, Paris...)"
+			class="w-full rounded-2xl border border-white/10 bg-white/10 py-3.5 pl-12 pr-4 text-base text-white outline-none placeholder-white/50 backdrop-blur-md transition-all hover:bg-white/15 focus:border-white/30 focus:bg-white/20 focus:ring-2 focus:ring-indigo-500/50"
+		/>
 				{#if showDropdown}
 					<div
 						class="absolute top-full right-0 left-0 z-50 mt-2 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl backdrop-blur-lg"
