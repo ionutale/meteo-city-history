@@ -36,12 +36,6 @@
 		}
 	});
 
-	$effect(() => {
-		if (weatherData) {
-			loading = false;
-		}
-	});
-
 	let bgGradient = $derived(
 		weatherData
 			? updateBackgroundTheme(weatherData.current.weather_code, weatherData.current.is_day)

@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	const flon = isNaN(lon) ? defaultLon : lon;
 	const flat = isNaN(lat) ? defaultLat : lat;
-	const fyears = isNaN(years) || years < 1 ? 20 : years;
+	const fyears = isNaN(years) || years < 1 ? 80 : years;
 
 	try {
 		const data = await getOrFetchWeather(flat, flon, city, country, tz, fyears);

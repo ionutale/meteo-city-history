@@ -24,7 +24,7 @@ test.describe('MeteoCast Dashboard', () => {
 		await expect(page.locator('#min-max-temp')).toBeVisible();
 
 		// Historical section loaded
-		await expect(page.locator('text=Analisi Climatica Storica')).toBeVisible();
+		await expect(page.getByRole('heading', { name: /Analisi Climatica Storica/ })).toBeVisible();
 
 		// Screenshot
 		await page.screenshot({
@@ -77,7 +77,7 @@ test.describe('MeteoCast Dashboard', () => {
 		test.slow();
 		await page.goto('/');
 		await expect(page.locator('#current-city')).toHaveText('Roma', { timeout: 30_000 });
-		await expect(page.locator('text=Griglia Calore')).toBeVisible();
+		await expect(page.getByRole('button', { name: 'Griglia Calore' })).toBeVisible();
 
 		// Switch to table view
 		await page.locator('button:has-text("Tabella")').click();
@@ -94,11 +94,11 @@ test.describe('MeteoCast Dashboard', () => {
 		// Change years via dropdown
 		await page.locator('#years-select').selectOption('30');
 		await page.locator('button:has-text("Applica")').click();
-		await expect(page.locator('text=Analisi Climatica Storica (Ultimi 30 Anni)')).toBeVisible({
+		await expect(page.getByRole('heading', { name: /Analisi Climatica Storica \(Ultimi 30 Anni\)/ })).toBeVisible({
 			timeout: 30_000
 		});
 
-		await expect(page.locator('text=Legenda Colori')).toBeVisible();
+		await expect(page.getByText('Legenda Colori')).toBeVisible();
 	});
 
 	test('Città rapide: click su Tokyo carica i dati', async ({ page }) => {
