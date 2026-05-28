@@ -5,21 +5,22 @@
 	let {
 		historicalData,
 		unit,
-		cityName
+		cityName,
+		historicalYears = 20,
+		onyearschange
 	}: {
 		historicalData: HistoricalData | null;
 		unit: 'C' | 'F';
 		cityName: string;
+		historicalYears?: number;
+		onyearschange?: (years: number) => void;
 	} = $props();
 
 	let viewMode = $state<'grid' | 'table'>('grid');
+	let yearsInput = $state(String(historicalYears));
 
 	let years = $derived(
-		historicalData
-			? Object.keys(historicalData)
-					.map(Number)
-					.sort((a, b) => b - a)
-			: []
+		historicalData ? Object.keys(historicalData).map(Number).sort((a, b) => b - a) : []
 	);
 
 	let flatList = $derived(() => {
@@ -41,6 +42,13 @@
 		if (temp < 10) return 'Rigido';
 		return 'Temperato';
 	}
+
+	function applyYears() {
+		const val = parseInt(yearsInput);
+		if (!isNaN(val) && val > 0 && val !== historicalYears) {
+			onyearschange?.(val);
+		}
+	}
 </script>
 
 <div
@@ -50,32 +58,52 @@
 		<div>
 			<h3 class="flex items-center gap-2 text-xl font-bold">
 				<i data-lucide="history" class="h-6 w-6 text-indigo-300"></i>
-				Analisi Climatica Storica (Ultimi 20 Anni)
+				Analisi Climatica Storica (Ultimi {historicalYears} Anni)
 			</h3>
 			<p class="mt-1 text-xs text-white/50">
-				Temperature massime mensili misurate a {cityName} dal {new Date().getFullYear() - 20} ad oggi
+				Temperature massime mensili misurate a {cityName} dal
+				{new Date().getFullYear() - historicalYears} ad oggi
 			</p>
 		</div>
 
-		<div class="flex rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur-md">
-			<button
-				onclick={() => (viewMode = 'grid')}
-				class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all {viewMode ===
-				'grid'
-					? 'bg-white text-slate-950 shadow'
-					: 'text-white/70 hover:text-white'}"
-			>
-				<i data-lucide="grid-3x3" class="h-3.5 w-3.5"></i> Griglia Calore
-			</button>
-			<button
-				onclick={() => (viewMode = 'table')}
-				class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all {viewMode ===
-				'table'
-					? 'bg-white text-slate-950 shadow'
-					: 'text-white/70 hover:text-white'}"
-			>
-				<i data-lucide="table" class="h-3.5 w-3.5"></i> Tabella
-			</button>
+		<div class="flex flex-wrap items-center gap-3">
+			<div class="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-md">
+				<label for="years-input" class="whitespace-nowrap text-xs font-medium text-white/70">
+					Anni:
+				</label>
+				<input
+					id="years-input"
+					type="number"
+					bind:value={yearsInput}
+					min="1"
+					max="100"
+					onkeydown={(e) => e.key === 'Enter' && applyYears()}
+					class="w-14 rounded-lg border border-white/10 bg-white/10 px-2 py-1 text-center text-xs font-semibold text-white outline-none focus:border-indigo-500"
+				/>
+				<button
+					onclick={applyYears}
+					class="rounded-lg bg-indigo-600 px-2.5 py-1 text-xs font-semibold text-white transition-all hover:bg-indigo-500 active:scale-95"
+				>
+					Applica
+				</button>
+			</div>
+
+			<div class="flex rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur-md">
+				<button
+					onclick={() => (viewMode = 'grid')}
+					class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all {viewMode === 'grid' ? 'bg-white text-slate-950 shadow' : 'text-white/70 hover:text-white'}"
+				>
+					<i data-lucide="grid-3x3" class="h-3.5 w-3.5"></i>
+					Griglia Calore
+				</button>
+				<button
+					onclick={() => (viewMode = 'table')}
+					class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all {viewMode === 'table' ? 'bg-white text-slate-950 shadow' : 'text-white/70 hover:text-white'}"
+				>
+					<i data-lucide="table" class="h-3.5 w-3.5"></i>
+					Tabella
+				</button>
+			</div>
 		</div>
 	</div>
 
@@ -87,26 +115,26 @@
 					class="absolute inset-0 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent"
 				></div>
 			</div>
-			<p class="animate-pulse text-xs text-indigo-200/50">
-				Caricamento archivio climatico storico...
-			</p>
+			<p class="animate-pulse text-xs text-indigo-200/50">Caricamento archivio climatico storico...</p>
 		</div>
 	{:else if viewMode === 'grid'}
 		<div
-			class="custom-scrollbar relative max-h-[420px] overflow-auto rounded-2xl border border-white/5 pb-2"
+			class="relative max-h-[420px] overflow-auto rounded-2xl border border-white/5 pb-2 custom-scrollbar"
 		>
-			<table class="w-full min-w-[800px] border-collapse text-center">
+			<table class="min-w-[800px] w-full border-collapse text-center">
 				<thead>
 					<tr class="text-xs font-semibold tracking-wider text-white/50 uppercase">
 						<th
-							class="sticky top-0 left-0 z-40 border-r border-b border-white/10 bg-slate-900/95 py-3 pl-4 text-left font-bold text-indigo-300 shadow-[2px_2px_5px_rgba(0,0,0,0.2)] backdrop-blur-md"
-							>Anno</th
+							class="sticky left-0 top-0 z-40 border-b border-r border-white/10 bg-slate-900/95 py-3 pl-4 text-left font-bold text-indigo-300 shadow-[2px_2px_5px_rgba(0,0,0,0.2)] backdrop-blur-md"
 						>
+							Anno
+						</th>
 						{#each ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'] as m}
 							<th
 								class="sticky top-0 z-30 border-b border-white/10 bg-slate-900/95 py-3 backdrop-blur-md"
-								>{m}</th
 							>
+								{m}
+							</th>
 						{/each}
 					</tr>
 				</thead>
@@ -122,9 +150,7 @@
 								{@const val = historicalData[year]?.[m]}
 								<td class="p-1 md:p-2">
 									<div
-										class="rounded-xl px-1 py-2.5 text-xs font-semibold {getCellColorClass(
-											val
-										)} transition-all duration-300"
+										class="rounded-xl px-1 py-2.5 text-xs font-semibold transition-all duration-300 {getCellColorClass(val)}"
 									>
 										{val !== undefined ? `${convertTemp(val, unit)}°` : '-'}
 									</div>
@@ -136,12 +162,10 @@
 			</table>
 		</div>
 	{:else}
-		<div class="custom-scrollbar max-h-96 overflow-x-auto">
-			<table class="w-full min-w-[400px] border-collapse text-left">
+		<div class="max-h-96 overflow-x-auto custom-scrollbar">
+			<table class="min-w-[400px] w-full border-collapse text-left">
 				<thead>
-					<tr
-						class="border-b border-white/10 text-xs font-semibold tracking-wider text-white/50 uppercase"
-					>
+					<tr class="border-b border-white/10 text-xs font-semibold tracking-wider text-white/50 uppercase">
 						<th class="py-3 pl-4">Periodo (Anno / Mese)</th>
 						<th class="py-3">Temperatura Massima Registrata</th>
 						<th class="py-3">Stato di riferimento</th>
@@ -153,9 +177,7 @@
 							<td class="py-3.5 pl-4 font-bold text-white/95">{item.label}</td>
 							<td class="py-3.5">
 								<span
-									class="inline-block rounded-full px-3 py-1 text-xs font-bold {getCellColorClass(
-										item.temp
-									)}"
+									class="inline-block rounded-full px-3 py-1 text-xs font-bold {getCellColorClass(item.temp)}"
 								>
 									{convertTemp(item.temp, unit)}°{unit}
 								</span>
@@ -169,9 +191,7 @@
 	{/if}
 
 	{#if historicalData}
-		<div
-			class="mt-6 flex flex-wrap items-center gap-4 border-t border-white/5 pt-4 text-xs text-white/40"
-		>
+		<div class="mt-6 flex flex-wrap items-center gap-4 border-t border-white/5 pt-4 text-xs text-white/40">
 			<span class="font-semibold tracking-wide uppercase">Legenda Colori (Massime):</span>
 			<div class="flex items-center gap-1.5">
 				<div class="h-3.5 w-3.5 rounded border border-blue-500/30 bg-blue-950/60"></div>

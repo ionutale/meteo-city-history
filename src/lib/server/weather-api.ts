@@ -29,9 +29,14 @@ async function fetchWeather(lat: number, lon: number, tz: string): Promise<Weath
 	});
 }
 
-async function fetchHistorical(lat: number, lon: number, tz: string): Promise<HistoricalData> {
+async function fetchHistorical(
+	lat: number,
+	lon: number,
+	tz: string,
+	years: number
+): Promise<HistoricalData> {
 	const today = new Date();
-	const startYear = today.getFullYear() - 40;
+	const startYear = today.getFullYear() - years;
 	const startDate = `${startYear}-01-01`;
 
 	const end = new Date(today);
@@ -71,9 +76,10 @@ export async function getOrFetchWeather(
 	lon: number,
 	cityName: string,
 	country: string,
-	timezone: string
+	timezone: string,
+	historicalYears = 20
 ): Promise<WeatherResponse> {
-	const cacheId = `${lat}_${lon}`;
+	const cacheId = `${lat}_${lon}_${historicalYears}`;
 	let cached: WeatherCache | null = null;
 
 	try {
@@ -87,7 +93,9 @@ export async function getOrFetchWeather(
 	const weatherOk =
 		cached?.weatherData != null && now - (cached.cachedAt?.getTime() ?? 0) < WEATHER_TTL;
 	const histOk =
-		cached?.historicalData != null && now - (cached.cachedAt?.getTime() ?? 0) < HISTORICAL_TTL;
+		cached?.historicalData != null &&
+		cached.historicalYears === historicalYears &&
+		now - (cached.cachedAt?.getTime() ?? 0) < HISTORICAL_TTL;
 
 	let wData = cached?.weatherData ?? null;
 	let hData = cached?.historicalData ?? null;
@@ -104,7 +112,7 @@ export async function getOrFetchWeather(
 
 	if (!histOk) {
 		try {
-			hData = await fetchHistorical(lat, lon, timezone);
+			hData = await fetchHistorical(lat, lon, timezone, historicalYears);
 			didFetch = true;
 		} catch (e) {
 			console.error('Historical fetch failed', e);
@@ -118,7 +126,8 @@ export async function getOrFetchWeather(
 		country,
 		latitude: lat,
 		longitude: lon,
-		timezone
+		timezone,
+		historicalYears
 	};
 
 	if (didFetch && wData) {
@@ -135,6 +144,7 @@ export async function getOrFetchWeather(
 						timezone,
 						weatherData: wData,
 						historicalData: hData,
+						historicalYears,
 						cachedAt: new Date()
 					}
 				},

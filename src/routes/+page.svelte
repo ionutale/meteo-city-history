@@ -17,7 +17,8 @@
 		country: initialCountry,
 		latitude: initialLat,
 		longitude: initialLon,
-		timezone: initialTz
+		timezone: initialTz,
+		historicalYears: initialYears = 20
 	}: {
 		weatherData: WeatherData | null;
 		historicalData: HistoricalData | null;
@@ -26,6 +27,7 @@
 		latitude: number;
 		longitude: number;
 		timezone: string;
+		historicalYears?: number;
 	} = $props();
 
 	let weatherData = $state<WeatherData | null>(initialWeather);
@@ -35,6 +37,7 @@
 	let latitude = $state(initialLat);
 	let longitude = $state(initialLon);
 	let timezone = $state(initialTz);
+	let historicalYears = $state(initialYears);
 	let unit = $state<'C' | 'F'>('C');
 	let error = $state('');
 	let loading = $state(false);
@@ -60,6 +63,18 @@
 		}
 	});
 
+	function updateUrl(lat: number, lon: number, city: string, ctry: string, tz: string, years: number) {
+		if (typeof window === 'undefined') return;
+		const url = new URL(window.location.href);
+		url.searchParams.set('lat', lat.toString());
+		url.searchParams.set('lon', lon.toString());
+		url.searchParams.set('city', city);
+		url.searchParams.set('country', ctry);
+		url.searchParams.set('tz', tz);
+		url.searchParams.set('years', years.toString());
+		history.replaceState({}, '', url.toString());
+	}
+
 	async function searchCity(query: string) {
 		if (!query.trim()) return;
 		error = '';
@@ -83,7 +98,7 @@
 			const ctry = result.country ? `${result.country}${region}` : '';
 			const tz = result.timezone || 'Europe/Rome';
 
-			await fetchWeatherData(result.latitude, result.longitude, city, ctry, tz);
+			await fetchWeatherData(result.latitude, result.longitude, city, ctry, tz, historicalYears);
 		} catch {
 			error = 'Errore durante la ricerca della città. Controlla la connessione.';
 			loading = false;
@@ -95,12 +110,13 @@
 		lon: number,
 		city: string,
 		ctry: string,
-		tz: string
+		tz: string,
+		years: number
 	) {
 		loading = true;
 		try {
 			const res = await fetch(
-				`/api/weather?lat=${lat}&lon=${lon}&city=${encodeURIComponent(city)}&country=${encodeURIComponent(ctry)}&timezone=${encodeURIComponent(tz)}`
+				`/api/weather?lat=${lat}&lon=${lon}&city=${encodeURIComponent(city)}&country=${encodeURIComponent(ctry)}&timezone=${encodeURIComponent(tz)}&years=${years}`
 			);
 			if (!res.ok) throw new Error('API error');
 			const data = await res.json();
@@ -112,10 +128,18 @@
 			latitude = data.latitude;
 			longitude = data.longitude;
 			timezone = data.timezone;
+			historicalYears = data.historicalYears;
+
+			updateUrl(lat, lon, city, ctry, tz, years);
 		} catch {
 			error = 'Impossibile caricare i dati meteorologici.';
 		}
 		loading = false;
+	}
+
+	async function handleYearsChange(years: number) {
+		historicalYears = years;
+		await fetchWeatherData(latitude, longitude, cityName, country, timezone, years);
 	}
 
 	function handleGps() {
@@ -146,9 +170,9 @@
 						detectedCountry = geoData.countryName || detectedCountry;
 					}
 
-					await fetchWeatherData(lat, lon, detectedCity, detectedCountry, tz);
+					await fetchWeatherData(lat, lon, detectedCity, detectedCountry, tz, historicalYears);
 				} catch {
-					await fetchWeatherData(lat, lon, 'Posizione Rilevata', 'GPS', tz);
+					await fetchWeatherData(lat, lon, 'Posizione Rilevata', 'GPS', tz, historicalYears);
 				}
 			},
 			(err) => {
@@ -198,7 +222,13 @@
 
 				<WeeklyForecast {weatherData} {unit} />
 
-				<HistoricalAnalysis {historicalData} {unit} {cityName} />
+				<HistoricalAnalysis
+					{historicalData}
+					{unit}
+					{cityName}
+					{historicalYears}
+					onyearschange={handleYearsChange}
+				/>
 			</main>
 		{/if}
 

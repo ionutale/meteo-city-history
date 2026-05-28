@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
 	webServer: {
@@ -14,5 +14,11 @@ export default defineConfig({
 		baseURL: 'http://localhost:4173',
 		screenshot: 'off',
 		video: 'off'
-	}
+	},
+	projects: [
+		{
+			name: 'chromium',
+			use: { ...devices['Desktop Chrome'] }
+		}
+	]
 });

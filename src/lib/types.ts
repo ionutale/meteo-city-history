@@ -36,6 +36,7 @@ export interface WeatherCache {
 	timezone: string;
 	weatherData: WeatherData;
 	historicalData: HistoricalData | null;
+	historicalYears: number;
 	cachedAt: Date;
 }
 
@@ -47,6 +48,7 @@ export interface WeatherResponse {
 	latitude: number;
 	longitude: number;
 	timezone: string;
+	historicalYears: number;
 }
 
 export interface WmoCondition {
