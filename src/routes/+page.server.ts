@@ -21,6 +21,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	try {
 		const data = await getOrFetchWeather(flat, flon, city, country, tz, fyears);
+		console.log('SSR load data weatherData:', data.weatherData ? 'exists' : 'null');
 		return data;
 	} catch (e) {
 		console.error('SSR load failed, returning empty', e);

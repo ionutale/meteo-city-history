@@ -44,6 +44,13 @@
 	let historicalLoading = $state(false);
 	let hasClientFallback = $state(false);
 
+	// Debug: check if SSR is getting weatherData
+	$effect(() => {
+		if (typeof window !== 'undefined') {
+			console.log('CLIENT initialWeather', initialWeather ? 'exists' : 'null');
+		}
+	});
+
 	// If SSR returned no data, fetch default Rome from client
 	$effect(() => {
 		if (typeof window !== 'undefined' && initialWeather === null && !hasClientFallback) {
@@ -221,6 +228,9 @@
 		<Header {unit} onunitchange={(u) => (unit = u)} ongpsclick={handleGps} />
 
 		<ErrorBanner message={error} onclose={() => (error = '')} />
+
+		<!-- SSR DEBUG -->
+		<div style="display:none" data-debug-weather={initialWeather ? 'exists' : 'null'}></div>
 
 		<SearchBar onsearch={searchCity} />
 
