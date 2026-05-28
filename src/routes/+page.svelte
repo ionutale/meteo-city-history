@@ -11,13 +11,13 @@
   import HistoricalAnalysis from '$lib/components/HistoricalAnalysis.svelte';
 
   let {
-    weatherData: ssrWeather,
-    historicalData: ssrHistorical,
-    cityName: ssrCity,
-    country: ssrCountry,
-    latitude: ssrLat,
-    longitude: ssrLon,
-    timezone: ssrTz
+    weatherData: initialWeather,
+    historicalData: initialHistorical,
+    cityName: initialCity,
+    country: initialCountry,
+    latitude: initialLat,
+    longitude: initialLon,
+    timezone: initialTz
   }: {
     weatherData: WeatherData | null;
     historicalData: HistoricalData | null;
@@ -28,13 +28,13 @@
     timezone: string;
   } = $props();
 
-  let weatherData = $state<WeatherData | null>(ssrWeather);
-  let historicalData = $state<HistoricalData | null>(ssrHistorical);
-  let cityName = $state(ssrCity);
-  let country = $state(ssrCountry);
-  let latitude = $state(ssrLat);
-  let longitude = $state(ssrLon);
-  let timezone = $state(ssrTz);
+  let weatherData = $state<WeatherData | null>(initialWeather);
+  let historicalData = $state<HistoricalData | null>(initialHistorical);
+  let cityName = $state(initialCity);
+  let country = $state(initialCountry);
+  let latitude = $state(initialLat);
+  let longitude = $state(initialLon);
+  let timezone = $state(initialTz);
   let unit = $state<'C' | 'F'>('C');
   let error = $state('');
   let loading = $state(false);

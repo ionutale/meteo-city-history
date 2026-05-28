@@ -8,7 +8,7 @@
       <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0"></i>
       <span class="text-sm font-medium">{message}</span>
     </div>
-    <button onclick={() => onclose?.()} class="p-1 hover:bg-white/10 rounded-full transition-all">
+    <button onclick={() => onclose?.()} aria-label="Chiudi errore" class="p-1 hover:bg-white/10 rounded-full transition-all">
       <i data-lucide="x" class="w-4 h-4"></i>
     </button>
   </div>
