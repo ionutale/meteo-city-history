@@ -7,17 +7,21 @@
 		unit,
 		cityName,
 		historicalYears = 20,
-		onyearschange
+		onyearschange,
+		isLoading = false
 	}: {
 		historicalData: HistoricalData | null;
 		unit: 'C' | 'F';
 		cityName: string;
 		historicalYears?: number;
 		onyearschange?: (years: number) => void;
+		isLoading?: boolean;
 	} = $props();
 
 	let viewMode = $state<'grid' | 'table'>('grid');
-	let yearsInput = $state(String(historicalYears));
+	let selectedYears = $state(historicalYears);
+
+	const yearOptions = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
 	let years = $derived(
 		historicalData ? Object.keys(historicalData).map(Number).sort((a, b) => b - a) : []
@@ -44,9 +48,8 @@
 	}
 
 	function applyYears() {
-		const val = parseInt(yearsInput);
-		if (!isNaN(val) && val > 0 && val !== historicalYears) {
-			onyearschange?.(val);
+		if (!isLoading && selectedYears !== historicalYears) {
+			onyearschange?.(selectedYears);
 		}
 	}
 </script>
@@ -67,24 +70,33 @@
 		</div>
 
 		<div class="flex flex-wrap items-center gap-3">
-			<div class="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-md">
-				<label for="years-input" class="whitespace-nowrap text-xs font-medium text-white/70">
-					Anni:
+			<div
+				class="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-md"
+			>
+				<label for="years-select" class="whitespace-nowrap text-xs font-medium text-white/70">
+					Periodo:
 				</label>
-				<input
-					id="years-input"
-					type="number"
-					bind:value={yearsInput}
-					min="1"
-					max="100"
-					onkeydown={(e) => e.key === 'Enter' && applyYears()}
-					class="w-14 rounded-lg border border-white/10 bg-white/10 px-2 py-1 text-center text-xs font-semibold text-white outline-none focus:border-indigo-500"
-				/>
+				<select
+					id="years-select"
+					bind:value={selectedYears}
+					disabled={isLoading}
+					class="w-20 rounded-lg border border-white/10 bg-white/10 px-2 py-1 text-center text-xs font-semibold text-white outline-none focus:border-indigo-500 disabled:opacity-50"
+				>
+					{#each yearOptions as opt}
+						<option value={opt} class="bg-slate-800">{opt} anni</option>
+					{/each}
+				</select>
 				<button
 					onclick={applyYears}
-					class="rounded-lg bg-indigo-600 px-2.5 py-1 text-xs font-semibold text-white transition-all hover:bg-indigo-500 active:scale-95"
+					disabled={isLoading || selectedYears === historicalYears}
+					class="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold text-white transition-all {isLoading || selectedYears === historicalYears ? 'cursor-not-allowed bg-indigo-600/50' : 'bg-indigo-600 hover:bg-indigo-500 active:scale-95'}"
 				>
-					Applica
+					{#if isLoading}
+						<div
+							class="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"
+						></div>
+					{/if}
+					{isLoading ? 'Caricamento...' : 'Applica'}
 				</button>
 			</div>
 
@@ -107,7 +119,7 @@
 		</div>
 	</div>
 
-	{#if !historicalData}
+	{#if isLoading && !historicalData}
 		<div class="flex flex-col items-center justify-center py-12">
 			<div class="relative mb-3 h-10 w-10">
 				<div class="absolute inset-0 rounded-full border-2 border-indigo-500/20"></div>
@@ -116,6 +128,16 @@
 				></div>
 			</div>
 			<p class="animate-pulse text-xs text-indigo-200/50">Caricamento archivio climatico storico...</p>
+		</div>
+	{:else if isLoading}
+		<div class="flex flex-col items-center justify-center py-8">
+			<div class="relative mb-3 h-8 w-8">
+				<div class="absolute inset-0 rounded-full border-2 border-indigo-500/20"></div>
+				<div
+					class="absolute inset-0 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent"
+				></div>
+			</div>
+			<p class="animate-pulse text-xs text-indigo-200/50">Aggiornamento archivio per {selectedYears} anni...</p>
 		</div>
 	{:else if viewMode === 'grid'}
 		<div

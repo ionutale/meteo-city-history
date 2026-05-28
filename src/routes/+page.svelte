@@ -40,7 +40,23 @@
 	let historicalYears = $state(initialYears);
 	let unit = $state<'C' | 'F'>('C');
 	let error = $state('');
-	let loading = $state(false);
+	let loading = $state(initialWeather === null);
+	let historicalLoading = $state(false);
+	let hasClientFallback = $state(false);
+
+	// If SSR returned no data, fetch default Rome from client
+	$effect(() => {
+		if (typeof window !== 'undefined' && initialWeather === null && !hasClientFallback) {
+			hasClientFallback = true;
+			fetchWeatherData(41.8903, 12.4922, 'Roma', 'Italia', 'Europe/Rome', historicalYears);
+		}
+	});
+
+	$effect(() => {
+		if (initialWeather !== null) {
+			loading = false;
+		}
+	});
 
 	let bgGradient = $derived(
 		weatherData
@@ -111,9 +127,14 @@
 		city: string,
 		ctry: string,
 		tz: string,
-		years: number
+		years: number,
+		isHistoricalUpdate = false
 	) {
-		loading = true;
+		if (isHistoricalUpdate) {
+			historicalLoading = true;
+		} else {
+			loading = true;
+		}
 		try {
 			const res = await fetch(
 				`/api/weather?lat=${lat}&lon=${lon}&city=${encodeURIComponent(city)}&country=${encodeURIComponent(ctry)}&timezone=${encodeURIComponent(tz)}&years=${years}`
@@ -134,12 +155,16 @@
 		} catch {
 			error = 'Impossibile caricare i dati meteorologici.';
 		}
-		loading = false;
+		if (isHistoricalUpdate) {
+			historicalLoading = false;
+		} else {
+			loading = false;
+		}
 	}
 
 	async function handleYearsChange(years: number) {
 		historicalYears = years;
-		await fetchWeatherData(latitude, longitude, cityName, country, timezone, years);
+		await fetchWeatherData(latitude, longitude, cityName, country, timezone, years, true);
 	}
 
 	function handleGps() {
@@ -227,6 +252,7 @@
 					{unit}
 					{cityName}
 					{historicalYears}
+					{isLoading}
 					onyearschange={handleYearsChange}
 				/>
 			</main>

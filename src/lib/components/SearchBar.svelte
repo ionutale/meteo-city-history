@@ -110,7 +110,7 @@
 
 	<div class="mt-4 flex flex-wrap justify-center gap-2 text-xs md:text-sm">
 		<span class="self-center text-white/40">Suggeriti:</span>
-		{#each ['Roma', 'Milano', 'Napoli', 'Palermo', 'Londra', 'New York'] as city}
+		{#each ['Roma', 'Milano', 'Napoli', 'Palermo', 'Londra', 'Tokyo', 'New York'] as city}
 			<button
 				onclick={() => quickSearch(city)}
 				class="rounded-xl border border-white/5 bg-white/5 px-3 py-1.5 transition-all hover:bg-white/10"

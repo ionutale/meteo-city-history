@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
 	webServer: {
-		command: 'pnpm build && pnpm preview',
+		command: 'dotenv -e .env -- pnpm build && dotenv -e .env -- pnpm preview',
 		port: 4173,
 		timeout: 120_000,
 		reuseExistingServer: !process.env.CI
