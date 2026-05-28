@@ -9,18 +9,13 @@
 	import HourlyForecast from '$lib/components/HourlyForecast.svelte';
 	import WeeklyForecast from '$lib/components/WeeklyForecast.svelte';
 	import HistoricalAnalysis from '$lib/components/HistoricalAnalysis.svelte';
+	import { page } from '$app/stores';
+	import { replaceState } from '$app/navigation';
 
-	let {
-		ssr = {} as import('$lib/types').WeatherResponse
-	}: {
-		ssr?: import('$lib/types').WeatherResponse;
-	} = $props();
+	let ssr = $page.data as import('$lib/types').WeatherResponse;
 
-	let initialWeather = $state<WeatherData | null>(ssr.weatherData ?? null);
-	let initialHistorical = $state<HistoricalData | null>(ssr.historicalData ?? null);
-
-	let weatherData = $state<WeatherData | null>(initialWeather);
-	let historicalData = $state<HistoricalData | null>(initialHistorical);
+	let weatherData = $state<WeatherData | null>(ssr.weatherData ?? null);
+	let historicalData = $state<HistoricalData | null>(ssr.historicalData ?? null);
 	let cityName = $state(ssr.cityName ?? 'Roma');
 	let country = $state(ssr.country ?? 'Italia');
 	let latitude = $state(ssr.latitude ?? 41.8903);
@@ -29,20 +24,20 @@
 	let historicalYears = $state(ssr.historicalYears ?? 20);
 	let unit = $state<'C' | 'F'>('C');
 	let error = $state('');
-	let loading = $state(initialWeather === null);
+	let loading = $state(weatherData === null);
 	let historicalLoading = $state(false);
 	let hasClientFallback = $state(false);
 
 	// If SSR returned no data, fetch default Rome from client
 	$effect(() => {
-		if (typeof window !== 'undefined' && initialWeather === null && !hasClientFallback) {
+		if (typeof window !== 'undefined' && !weatherData && !hasClientFallback) {
 			hasClientFallback = true;
-			fetchWeatherData(41.8903, 12.4922, 'Roma', 'Italia', 'Europe/Rome', historicalYears);
+			fetchWeatherData(41.8903, 12.4922, 'Roma', 'Italia', 'Europe/Rome', 20);
 		}
 	});
 
 	$effect(() => {
-		if (initialWeather !== null) {
+		if (weatherData) {
 			loading = false;
 		}
 	});
@@ -77,7 +72,7 @@
 		url.searchParams.set('country', ctry);
 		url.searchParams.set('tz', tz);
 		url.searchParams.set('years', years.toString());
-		history.replaceState({}, '', url.toString());
+		replaceState(url, {});
 	}
 
 	async function searchCity(query: string) {
@@ -210,9 +205,6 @@
 		<Header {unit} onunitchange={(u) => (unit = u)} ongpsclick={handleGps} />
 
 		<ErrorBanner message={error} onclose={() => (error = '')} />
-
-		<!-- SSR DEBUG -->
-		<div style="display:none" data-debug-weather={initialWeather ? 'exists' : 'null'}></div>
 
 		<SearchBar onsearch={searchCity} />
 

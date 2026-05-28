@@ -21,7 +21,7 @@
 	let viewMode = $state<'grid' | 'table'>('grid');
 	let selectedYears = $state(historicalYears);
 
-	const yearOptions = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+	const yearOptions = [10, 20, 30, 40, 50, 60, 70, 80];
 
 	let years = $derived(
 		historicalData ? Object.keys(historicalData).map(Number).sort((a, b) => b - a) : []
@@ -228,8 +228,8 @@
 				<span>Caldo (20°-30°C)</span>
 			</div>
 			<div class="flex items-center gap-1.5">
-				<div class="h-3.5 w-3.5 rounded border border-rose-500/30 bg-rose-950/55"></div>
-				<span>Molto Caldo (&gt;30°C)</span>
+				<div class="h-3.5 w-3.5 rounded border border-red-500/30 bg-red-950/55"></div>
+				<span>Molto Caldo (&gt;=30°C)</span>
 			</div>
 		</div>
 	{/if}

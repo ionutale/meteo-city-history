@@ -81,7 +81,7 @@ export function getCellColorClass(celsiusValue: number | undefined): string {
 		return 'bg-teal-950/40 text-teal-200 border border-teal-500/20 hover:bg-teal-900/40';
 	if (celsiusValue < 30)
 		return 'bg-amber-950/40 text-amber-200 border border-amber-500/20 hover:bg-amber-900/40';
-	return 'bg-rose-950/55 text-rose-200 border border-rose-500/30 hover:bg-rose-900/50';
+	return 'bg-red-950/55 text-red-200 border border-red-500/30 hover:bg-red-900/50';
 }
 
 export function updateBackgroundTheme(code: number, isDay: number): string {
